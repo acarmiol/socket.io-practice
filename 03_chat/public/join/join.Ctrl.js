@@ -1,29 +1,26 @@
+(function() {
+    'use strict';
 
+    angular
+        .module('app')
+        .controller('JoinCtrl', JoinCtrl);
 
+    JoinCtrl.$inject = ['$location', '$scope', '$localStorage', 'socket'];
 
-  (function() {
-     'use strict';
+    function JoinCtrl($location, $scope, $localStorage, socket) {
+        $scope.name = '';
+        var nickname;
 
-     angular
-         .module('app')
-         .controller('JoinCtrl', JoinCtrl);
+        $scope.join = function() {
+            nickname = $scope.name;
+            $localStorage.nickname = nickname;
 
-     JoinCtrl.$inject = ['$location', '$scope', '$localStorage', 'socket'];
+            socket.emit('join', {
+                nickname: nickname
+            });
 
-     function JoinCtrl($location, $scope, $localStorage, socket) {
-     	$scope.name = '';
-     	var nickname;
+            $location.path('/main');
 
-     	$scope.join = function(){
-     		nickname = $scope.name;
-     		$localStorage.nickname = $scope.name;
-
-     		socket.emit('join',{
-     			nickname:nickname
-     		});
-
-     		$location.path('/main');
-
-     	}
-     }
- })();
+        };
+    }
+})();

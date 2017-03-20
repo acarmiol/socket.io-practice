@@ -19,7 +19,7 @@
     	socket.on(eventName,function(){
     		var args= arguments;
     		$rootScope.$apply(function(){
-    			callback.apply(socket.args);
+    			callback.apply(socket,args);
     		});
     	});
     };
