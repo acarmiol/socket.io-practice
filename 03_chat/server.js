@@ -13,6 +13,17 @@ app.use('/bower_components',express.static(__dirname+'/bower_components'));
 io.on('connection', function(socket) {
   console.log('new connection made');
 
+  // Join private room
+
+  socket.on('join-private',function(data){
+    socket.join('private');
+    console.log(data.nickname + 'joined private');
+  });
+
+  socket.on('private-chat', function(data){
+    socket.broadcast.to('private').emit('show-message',data.message);
+  });
+
   // Show all users when first logged on
   socket.on('get-users',function(){
   	socket.emit('all-users',users);
@@ -32,23 +43,23 @@ io.on('connection', function(socket) {
   // Broadcast the message
 socket.on('send-message',function(data){
   // socket.broadcast.emit('message-received',data);
-  io.emit('message-received',data)
+  io.emit('message-received',data);
 });
 
   // Send a 'like' to the user of my choice
   socket.on('send-like', function(data){
     console.log(data);
     socket.broadcast.to(data.like).emit('user-liked',data);
-  })
+  });
   // Disconnect from socket
   socket.on('disconnect',function(){
     users = users.filter(function(item){
       return item.nickname!==socket.nickname;
 
 
-    })
-    io.emit('all-users', users)
-  })
+    });
+    io.emit('all-users', users);
+  });
 
 });
 
