@@ -29,8 +29,30 @@ io.on('connection', function(socket) {
   	users.push(userObj);
   	io.emit('all-users', users);
   });
+  // Broadcast the message
+socket.on('send-message',function(data){
+  // socket.broadcast.emit('message-received',data);
+  io.emit('message-received',data)
+});
+
+  // Send a 'like' to the user of my choice
+  socket.on('send-like', function(data){
+    console.log(data);
+    socket.broadcast.to(data.like).emit('user-liked',data);
+  })
+  // Disconnect from socket
+  socket.on('disconnect',function(){
+    users = users.filter(function(item){
+      return item.nickname!==socket.nickname;
+
+
+    })
+    io.emit('all-users', users)
+  })
 
 });
+
+
 
 server.listen(port, function() {
   console.log("Listening on port " + port);

@@ -8,6 +8,12 @@
   MainCtrl.$inject = ['$scope', '$localStorage', 'socket', 'lodash'];
 
   function MainCtrl($scope, $localStorage, socket, lodash) {
+    $scope.message='';
+    $scope.messages=[];
+    $scope.likes=[];
+
+
+
   	$scope.users = [];
   	$scope.mynickname = $localStorage.nickname;
   	var nickname = $scope.mynickname;
@@ -20,6 +26,34 @@
   			return item.nickname !== nickname;
   		});
   	});
+
+    socket.on('message-received',function(data){
+      $scope.messages.push(data);
+    });
+
+    socket.on('user-liked',function(data){
+      console.log(data);
+      $scope.likes.push(data.from)
+    })
+
+    $scope.sendMessage = function(data){
+      var newMessage = {
+        message:$scope.message,
+        from:$scope.mynickname
+      }
+      socket.emit('send-message',newMessage);
+      $scope.message='';
+      // $scope.messages.push(newMessage);
+    }
+    $scope.sendLike = function(user){
+      console.log(user);
+      var id = lodash.get(user,'socketid');
+      var likeObj = {
+        from:nickname,
+        like:id
+      }
+      socket.emit('send-like',likeObj);
+    }
 
   }
 })();
